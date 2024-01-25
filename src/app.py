@@ -32,12 +32,15 @@ df = pd.read_csv("results_df_method_001_trimmed.csv")
 
 
 price_labels = []
-[price_labels.append(f"min: {df.price_min.iloc[i]}, max: {df.price_max.iloc[i]}, SD: {df.price_SD.iloc[i]}, SE: {np.round(df.price_SD.iloc[i]/np.sqrt(df.n_samp.iloc[i]),2)}") for i in range(len(df))]
+[price_labels.append(f"{df.price_X.iloc[i]} [{df.price_min.iloc[i]} {df.price_max.iloc[i]}], SD: {df.price_SD.iloc[i]}, SE: {np.round(df.price_SD.iloc[i]/np.sqrt(df.n_samp.iloc[i]),2)}") for i in range(len(df))]
 pred_len_labels = []
-[pred_len_labels.append(f"SD: {df.pred_len_SD.iloc[i]}, SE: {np.round(df.price_SD.iloc[i]/np.sqrt(df.n_samp.iloc[i]),2)}") for i in range(len(df))]
+[pred_len_labels.append(f"{df.pred_len_X.iloc[i]}, SD: {df.pred_len_SD.iloc[i]}, SE: {np.round(df.pred_len_SD.iloc[i]/np.sqrt(df.n_trades.iloc[i]),2)}") for i in range(len(df))]
 trade_vol_labels = []
-[trade_vol_labels.append(f"{np.round(df.tot_trade_vol[i],5)} BTC") for i in range(len(df))]
-
+[trade_vol_labels.append(f"{np.round(df.tot_trade_vol_2[i],2)} FDUSD, {np.round(df.tot_trade_vol[i],5)} BTC") for i in range(len(df))]
+trade_vol_h_labels = []
+[trade_vol_h_labels.append(f"{np.round(df.trade_vol_h_2[i],2)} FDUSD, {np.round(df.trade_vol_h[i],5)} BTC") for i in range(len(df))]
+spread_labels = []
+[spread_labels.append(f"{np.round(df.spread_bp_X[i],3)} b.p., SD = {np.round(df.spread_bp_SD[i],3)}, SE = {np.round(df.spread_bp_SD[i]/np.sqrt(df.n_trades),3)}") for i in range(len(df))]
 
 # Sample data for different sets of values
 data_options = {
@@ -51,6 +54,9 @@ data_options = {
     'option8': {'categories': df.index, 'values': df.price_X, 'labels': price_labels},
     'option9': {'categories': df.index, 'values': df.pred_len_X, 'labels': pred_len_labels},
     'option10': {'categories': df.index, 'values': df.tot_trade_vol_2, 'labels': trade_vol_labels},
+    'option11': {'categories': df.index, 'values': df.trade_vol_h_2, 'labels': trade_vol_h_labels},
+    'option12': {'categories': df.index, 'values': df.spread_bp_X, 'labels': spread_labels},
+    'option13': {'categories': df.index, 'values': df.pred_on_time, 'labels': np.round(df.pred_on_time,2)},
 }
 
 app.layout = html.Div([
@@ -67,6 +73,9 @@ app.layout = html.Div([
             {'label': 'BTC Price', 'value': 'option8'},
             {'label': 'Prediction Duration', 'value': 'option9'},
             {'label': 'Trade Volume', 'value': 'option10'},
+            {'label': 'Trade Volume / h', 'value': 'option11'},
+            {'label': 'Spread', 'value': 'option12'},
+            {'label': 'Prediction ON Time', 'value': 'option13'},
         ],
         value='option1'
     ),
@@ -147,10 +156,25 @@ def update_bar_chart(selected_option):
             title_text='FDUSD'
         )
         fig.update_layout(title=f"Tot. Trade Volume = {int(np.sum(df.tot_trade_vol_2))} FDUSD ({np.round(np.sum(df.tot_trade_vol),5)} BTC)")
+    elif selected_option == 'option11':
+        fig.update_yaxes(
+            title_text='FDUSD'
+        )
+        fig.update_layout(title=f"Tot. Trade Volume / h mean = {np.round(np.mean(df.trade_vol_h_2),2)} FDUSD ({np.round(np.mean(df.trade_vol_h),5)} BTC)")
+    elif selected_option == 'option12':
+        fig.update_yaxes(
+            title_text='Basis Points (b.p.)'
+        )
+        fig.update_layout(title=f"Spread mean of means = {np.round(np.mean(df.spread_bp_X),3)} b.p.")
+    elif selected_option == 'option13':
+        fig.update_yaxes(
+            title_text='%'
+        )
+        fig.update_layout(title=f"Prediction ON time mean of means = {np.round(np.mean(df.pred_on_time),2)} %")
 
 
-    # Save the chart as an HTML file
-    fig.write_html("results_method_001.html")
+    ## Save the chart as an HTML file
+    #fig.write_html("results_method_001.html")
 
     return fig
 
