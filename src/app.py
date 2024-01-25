@@ -40,7 +40,7 @@ trade_vol_labels = []
 trade_vol_h_labels = []
 [trade_vol_h_labels.append(f"{np.round(df.trade_vol_h_2[i],2)} FDUSD, {np.round(df.trade_vol_h[i],5)} BTC") for i in range(len(df))]
 spread_labels = []
-[spread_labels.append(f"{np.round(df.spread_bp_X[i],3)} b.p., SD = {np.round(df.spread_bp_SD[i],3)}, SE = {np.round(df.spread_bp_SD[i]/np.sqrt(df.n_trades),3)}") for i in range(len(df))]
+[spread_labels.append(f"{np.round(df.spread_bp_X[i],3)} b.p., SD = {np.round(df.spread_bp_SD[i],3)}, SE = {np.round(df.spread_bp_SD[i]/np.sqrt(df.n_trades.iloc[i]),3)}") for i in range(len(df))]
 
 # Sample data for different sets of values
 data_options = {
